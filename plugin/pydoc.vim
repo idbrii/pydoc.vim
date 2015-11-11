@@ -117,10 +117,9 @@ function! s:ShowPyDoc(name, type)
 		return
 	endif
 
-	if exists('t:pydoc_window')
-		let l:winnr = t:pydoc_window
-		" The window exists
-		if getwinvar(l:winnr, '&ft') ==# 'pydoc'
+	if exists('t:pydoc_buffer')
+		let l:winnr = bufwinnr(t:pydoc_buffer)
+		if l:winnr != -1 && getwinvar(l:winnr, '&ft') ==# 'pydoc'
 			" The window is still being used for pydoc
 			" Therefore, reuse it
 			execute l:winnr . 'wincmd w'
@@ -130,7 +129,7 @@ function! s:ShowPyDoc(name, type)
 			call s:WindowNew()
 		endif
 	else
-		" Pydoc has never run before, nothing to reuse
+		" PyDoc has never run before, nothing to reuse
 		call s:WindowNew()
 	endif
 
@@ -171,8 +170,8 @@ function! s:ShowPyDoc(name, type)
 		echom 'PyDoc: ' . l:line
 	else
 		" SUCESS!
-		" Save the current window name
-		let t:pydoc_window = winnr()
+		" Save the current window buffer
+		let t:pydoc_buffer = bufnr('%')
 		if l:line =~# '^Help on module .*:$' && empty(getline(2))
 			let b:pydoc_type = 'module'
 			" Delete the header
@@ -194,7 +193,6 @@ function! PyDocGrep(string)
 	return s:ShowPyDoc(a:string, 0)
 endfunction
 
-"TODO
 function! s:ExpandModulePath()
 	" Extract the 'word' at the cursor, expanding leftwards across identifiers
 	" and the . operator, and rightwards across the identifier only.
