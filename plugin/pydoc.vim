@@ -215,6 +215,5 @@ command! -nargs=1 PyDoc     call PyDoc(<f-args>)
 command! -nargs=* PyDocGrep call PyDocGrep(<q-args>)
 
 nnoremap <silent> <buffer> <Plug>(PyDocCurrentModule) :<C-u>call PyDoc(<SID>ExpandModulePath())<CR>
-autocmd Filetype pydoc nmap <buffer> K <Plug>(PyDocCurrentModule)
 
 " vim:set ts=2 sw=2
