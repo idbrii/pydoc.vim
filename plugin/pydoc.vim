@@ -149,7 +149,8 @@ function! s:ShowPyDoc(name, type)
 	if a:type == 0
 		let l:pydoc_options .= ' -k'
 	endif
-	let s:cmd = g:pydoc_cmd .' '.l:pydoc_options.' '. shellescape(l:name)
+	let l:pydoc_cmd = get(b:, 'pydoc_cmd', get(t:, 'pydoc_cmd', g:pydoc_cmd))
+	let s:cmd = l:pydoc_cmd .' '.l:pydoc_options.' '. shellescape(l:name)
 	if &verbose
 		echomsg "PyDoc: " s:cmd
 	endif
