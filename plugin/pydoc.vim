@@ -95,6 +95,7 @@ let g:loaded_pydoc = 1
 
 if !exists('g:pydoc_cmd')
 	let g:pydoc_cmd = 'pydoc'
+	let g:pydoc_detect_version = 1
 endif
 
 if !exists('g:pydoc_new_cmd')
