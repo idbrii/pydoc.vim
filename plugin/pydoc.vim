@@ -103,12 +103,24 @@ endif
 if !exists('g:pydoc_existing_cmd')
 	let g:pydoc_existing_cmd = 'enew'
 endif
+let g:noswapfile_cmd = ''
+let g:noswapfile_opt = 'set noswapfile'
+if exists(':noswapfile')
+	let g:noswapfile_cmd = 'noswapfile'
+	let g:noswapfile_opt = ''
+endif
 
 function! s:WindowNew()
-	execute 'noswapfile' g:pydoc_open_cmd
+	execute g:noswapfile_cmd g:pydoc_open_cmd
+	if len(g:noswapfile_opt)
+		execute g:noswapfile_opt
+	endif
 endfunction
 function! s:WindowOld()
-	execute 'noswapfile' g:pydoc_existing_cmd
+	execute g:noswapfile_cmd g:pydoc_existing_cmd
+	if len(g:noswapfile_opt)
+		execute g:noswapfile_opt
+	endif
 endfunction
 
 " Args: name: lookup; type: 0: search, 1: lookup
