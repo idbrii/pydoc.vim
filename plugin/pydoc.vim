@@ -188,10 +188,10 @@ function! s:ShowPyDoc(name, type)
 	endif
 endfunction
 
-function! PyDoc(string)
+function! s:PyDoc(string)
 	return s:ShowPyDoc(a:string, 1)
 endfunction
-function! PyDocGrep(string)
+function! s:PyDocGrep(string)
 	return s:ShowPyDoc(a:string, 0)
 endfunction
 
@@ -210,11 +210,66 @@ function! s:ExpandModulePath()
 	return matchstr(pre, "[A-Za-z0-9_.]*$") . matchstr(suf, "^[A-Za-z0-9_]*")
 endfunction
 
+function! s:PyDocWrapper()
+	let l:iskeyword_orig = &iskeyword
+	let &l:iskeyword .= ',.'
+
+	let l:search_term = ''
+	let l:line = getline('.')
+	let l:col  = col('.')
+	let l:current_word = expand('<cword>')
+
+	" First pattern: Simple import
+	" TODO: s:ExpandModulePath
+	let l:match = matchlist(l:line, '\v^import (%(\k|[, ])+)$')
+	if l:search_term == '' && !empty(l:match)
+		if l:current_word ==# 'import'
+			" Search for the first package
+			let l:search_term = split(l:match[1], '\v, ?')[0]
+		else " Cursor on a package
+			let l:search_term = l:current_word
+		endif
+	endif
+	" Second pattern: Complex import
+	" TODO: s:ExpandModulePath
+	let l:match = matchlist(l:line, '\v^from (\k+) import (%(\k|[, ]){-})%( as (%(\k|[, ])+))?$')
+	if l:search_term == '' && !empty(l:match)
+		let l:package = l:match[1]
+		if index(['from', l:package], l:current_word) >= 0
+			" If inside the keyword or package name
+			let l:search_term = l:package
+		else " Search for PACKAGE.RIGHT_SIDE
+			let l:right_match = '.'
+			let l:as_word = l:match[3]
+			if index(['import', 'as', l:as_word], l:current_word) >= 0
+				" If inside the keywords, search for the first right match
+				" Or if the current keyword is on the 'as' section
+				let l:right_match .= split(l:match[2], '\v, ?')[0]
+			else
+				let l:right_match .= l:current_word
+			endif
+			let l:search_term = l:package.l:right_match
+		endif
+	endif
+	" Other patterns: regular middle-of-the-code search
+	" TODO: Parse the imports?
+	" TODO: s:ExpandModulePath
+	if l:search_term == ''
+		let l:search_term = l:current_word
+	endif
+
+	let &l:iskeyword = l:iskeyword_orig
+	if l:search_term !=# ''
+		call s:PyDoc(l:search_term)
+	else
+		echo 'No matching search'
+	endif
+endfunction
+
 " External Interface
-command! -nargs=1 PyDoc     call PyDoc(<f-args>)
+command! -nargs=1 PyDoc     call <SID>PyDoc(<f-args>)
 " q-args turn all the arguments into a single quoted string
-command! -nargs=* PyDocGrep call PyDocGrep(<q-args>)
+command! -nargs=* PyDocGrep call <SID>PyDocGrep(<q-args>)
 
-nnoremap <silent> <buffer> <Plug>(PyDocCurrentModule) :<C-u>call PyDoc(<SID>ExpandModulePath())<CR>
-
+nnoremap <silent> <Plug>(PyDocK) :<C-u>call <SID>PyDocWrapper()<CR>
 " vim:set ts=2 sw=2
