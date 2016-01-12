@@ -173,6 +173,7 @@ function! s:ShowPyDoc(name, type)
 	else
 		" SUCESS!
 		" Save the current window buffer
+		let b:pydoc_name = l:name
 		let t:pydoc_buffer = bufnr('%')
 		if l:line =~# '^Help on module .*:$' && empty(getline(2))
 			let b:pydoc_type = 'module'
