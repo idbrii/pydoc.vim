@@ -98,7 +98,7 @@ if !exists('g:pydoc_cmd')
 	let g:pydoc_detect_version = 1
 endif
 
-if !exists('g:pydoc_new_cmd')
+if !exists('g:pydoc_open_cmd')
 	let g:pydoc_open_cmd = 'vertical new'
 endif
 if !exists('g:pydoc_existing_cmd')
