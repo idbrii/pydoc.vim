@@ -220,7 +220,16 @@ function! s:PyDocWrapper()
 	let l:col  = col('.')
 	let l:current_word = expand('<cword>')
 
-	" First pattern: Simple import
+	" Pattern: Simple import, can have alias
+	" Location: Import lines
+	" TODO: s:ExpandModulePath
+	let l:match = matchlist(l:line, '\V\^\s\*import\s\+\(\w\+\)\(\s\+as\s\+\(\w\+\)\|\$\)')
+	if l:search_term == '' && !empty(l:match)
+		" Search for the unaliased packages name
+		let l:search_term = l:match[1]
+	endif
+	" Pattern: Simple multiple imports
+	" Location: Import lines
 	" TODO: s:ExpandModulePath
 	let l:match = matchlist(l:line, '\v^import (%(\k|[, ])+)$')
 	if l:search_term == '' && !empty(l:match)
@@ -231,7 +240,8 @@ function! s:PyDocWrapper()
 			let l:search_term = l:current_word
 		endif
 	endif
-	" Second pattern: Complex import
+	" Pattern: Most Complex import
+	" Location: Import lines
 	" TODO: s:ExpandModulePath
 	let l:match = matchlist(l:line, '\v^from (\k+) import (%(\k|[, ]){-})%( as (%(\k|[, ])+))?$')
 	if l:search_term == '' && !empty(l:match)
@@ -251,6 +261,25 @@ function! s:PyDocWrapper()
 			endif
 			let l:search_term = l:package.l:right_match
 		endif
+	endif
+
+	" Pattern: Searching for an aliased module
+	" Location: Rest of the code
+	if l:search_term == ''
+		let l:currentpos = getpos('.')
+		let l:hier = split(l:current_word, '\.')
+		let l:main_module = l:hier[0]
+		let l:regex = '\V\^\s\*\%(from\s\*\(\k\+\)\s\*\)\?import\s\+\%(\('. l:main_module .'\)\$\|\(\k\+\)\s\+as\s\+\%('. l:main_module .'\)\s\*\)'
+		if search(l:regex)
+			let l:matches = matchlist(getline('.'), l:regex)
+			let l:package = l:matches[2] . l:matches[3] "Only one is filled
+			if l:matches[1] != ''
+				let l:package = l:matches[1]. '.' .l:package
+			endif
+			let l:hier[0] = l:package
+		endif
+		let l:search_term = join(l:hier, '.')
+		call setpos('.', l:currentpos)
 	endif
 	" Other patterns: regular middle-of-the-code search
 	" TODO: Parse the imports?
