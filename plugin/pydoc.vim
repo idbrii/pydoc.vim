@@ -118,6 +118,9 @@ function! s:ShowPyDoc(name, type)
 		return
 	endif
 
+	" Grab the cmd from the buffer requesting pydoc.
+	let l:pydoc_cmd = get(b:, 'pydoc_cmd', get(t:, 'pydoc_cmd', g:pydoc_cmd))
+
 	if exists('t:pydoc_buffer')
 		let l:winnr = bufwinnr(t:pydoc_buffer)
 		if l:winnr != -1 && getwinvar(l:winnr, '&ft') ==# 'pydoc'
@@ -150,7 +153,6 @@ function! s:ShowPyDoc(name, type)
 	if a:type == 0
 		let l:pydoc_options .= ' -k'
 	endif
-	let l:pydoc_cmd = get(b:, 'pydoc_cmd', get(t:, 'pydoc_cmd', g:pydoc_cmd))
 	let s:cmd = l:pydoc_cmd .' '.l:pydoc_options.' '. shellescape(l:name)
 	if &verbose
 		echomsg "PyDoc: " s:cmd
