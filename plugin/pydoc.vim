@@ -105,6 +105,10 @@ if !exists('g:pydoc_existing_cmd')
 	let g:pydoc_existing_cmd = 'enew'
 endif
 
+if !exists('g:pydoc_allow_shellescape')
+	let g:pydoc_allow_shellescape = 1
+endif
+
 function! s:WindowNew()
 	execute g:pydoc_open_cmd
 endfunction
@@ -153,7 +157,10 @@ function! s:ShowPyDoc(name, type)
 	if a:type == 0
 		let l:pydoc_options .= ' -k'
 	endif
-	let s:cmd = l:pydoc_cmd .' '.l:pydoc_options.' '. shellescape(l:name)
+	if g:pydoc_allow_shellescape
+		let l:name = shellescape(l:name)
+	endif
+	let s:cmd = l:pydoc_cmd .' '.l:pydoc_options.' '. l:name
 	if &verbose
 		echomsg "PyDoc: " s:cmd
 	endif
