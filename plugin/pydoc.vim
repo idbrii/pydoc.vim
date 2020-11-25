@@ -160,7 +160,7 @@ function! s:ShowPyDoc(name, type)
 	" The lines read start on the second line, because the first was already
 	" there in the empty buffer
 	goto "first line
-	delete _ "current line, into the black-hole register
+	silent delete _ "current line, into the black-hole register
 
 	let l:line = getline(1)
 	if l:line =~ '^no Python documentation found for.*$'
@@ -178,7 +178,7 @@ function! s:ShowPyDoc(name, type)
 		if l:line =~# '^Help on module .*:$' && empty(getline(2))
 			let b:pydoc_type = 'module'
 			" Delete the header
-			normal! "_2dd
+			silent normal! "_2dd
 		else
 			let b:pydoc_type = 'others'
 		endif
