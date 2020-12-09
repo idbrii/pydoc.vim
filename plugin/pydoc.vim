@@ -15,11 +15,11 @@
 " into Vim. It allows you to view the documentation of a Python module or class
 " by typing:
 "
-" :Pydoc foo.bar.baz (e.g. :Pydoc re.compile)
+" :PyDoc foo.bar.baz (e.g. :PyDoc re.compile)
 "
 " Or search a word (uses pydoc -k) in the documentation by typing:
 "
-" :PydocSearch foobar (e.g. :PydocSearch socket)
+" :PyDocGrep foobar (e.g. :PyDocGrep socket)
 "
 " Vim will split the current window to show the Python documentation found by
 " pydoc, and reuse that window in case you search for other things.
@@ -27,7 +27,7 @@
 " pydoc.vim also allows you to view the documentation of the 'word' (see :help
 " word) under the cursor by pressing <Leader>pw or the 'WORD' (see :help WORD)
 " under the cursor by pressing <Leader>pW. This is very useful if you want to
-" jump to the docs of a module or class found by 'PydocSearch' or if you want
+" jump to the docs of a module or class found by 'PyDocGrep' or if you want
 " to see the docs of a module/class in your source code. Additionally K is
 " mapped to show invoke pydoc as well, when you are editing python files.
 "
